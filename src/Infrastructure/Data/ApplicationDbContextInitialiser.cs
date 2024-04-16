@@ -76,10 +76,11 @@ public class ApplicationDbContextInitialiser
 
         // Default users
         var administrator = new ApplicationUser { UserName = "administrator@localhost", Email = "administrator@localhost" };
-
+        var userId = string.Empty;
         if (_userManager.Users.All(u => u.UserName != administrator.UserName))
         {
             await _userManager.CreateAsync(administrator, "Administrator1!");
+            userId = _userManager.Users.First(c => c.UserName!.Equals(administrator.UserName)).Id;
             if (!string.IsNullOrWhiteSpace(administratorRole.Name))
             {
                 await _userManager.AddToRolesAsync(administrator, new [] { administratorRole.Name });
@@ -93,6 +94,7 @@ public class ApplicationDbContextInitialiser
             _context.TodoLists.Add(new TodoList
             {
                 Title = "Todo List",
+                UserId = userId,
                 Items =
                 {
                     new TodoItem { Title = "Make a todo list 📃" },

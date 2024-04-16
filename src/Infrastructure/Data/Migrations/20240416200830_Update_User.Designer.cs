@@ -12,7 +12,7 @@ using SampleProject.Infrastructure.Data;
 namespace SampleProject.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240416192938_Update_User")]
+    [Migration("20240416200830_Update_User")]
     partial class Update_User
     {
         /// <inheritdoc />

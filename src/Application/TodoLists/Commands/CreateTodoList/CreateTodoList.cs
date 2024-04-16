@@ -22,10 +22,18 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
         var entity = new TodoList();
        
         entity.Title = request.Title;
-        entity.UserId = "e59f6dac-feeb-4313-9ed9-d21310d63000";
+        entity.UserId = "3251b05f-f115-4ad5-85c8-9f5cdad308bb";
         _context.TodoLists.Add(entity);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception eee )
+        {
+            var t = eee;
+            throw;
+        }
         var test = _context.TodoLists.Include(c=>c.User)
                                      .FirstOrDefault(t => t.Title == request.Title);
         return entity.Id;
