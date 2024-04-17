@@ -33,6 +33,8 @@ public static class DependencyInjection
         services.AddOpenApiDocument((configure, sp) =>
         {
             configure.Title = "SampleProject API";
+            //define naming of method in nswag generated client
+            configure.OperationProcessors.Add(new FlattenOperationsProcessor());
 
         });
 

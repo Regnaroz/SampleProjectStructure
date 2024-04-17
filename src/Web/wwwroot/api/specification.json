@@ -319,6 +319,27 @@
           }
         }
       }
+    },
+    "/api/Test/GetNumberFromROute": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "operationId": "GetNumberUpdated2",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
