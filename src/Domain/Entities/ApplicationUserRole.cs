@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 
 namespace SampleProject.Domain.Entities;
-public class ApplicationUser : IdentityUser
+public class ApplicationUserRole: IdentityUserRole<string>
 {
-    public virtual ICollection<ApplicationUserRole> ApplicationUserRoles { get; set; }
+    public virtual ApplicationUser User { get; set; }
+    public virtual ApplicationRole Role { get; set; }
 }
