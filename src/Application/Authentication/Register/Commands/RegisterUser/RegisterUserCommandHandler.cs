@@ -28,7 +28,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
         var isEmailExist = await _userManager.FindByEmailAsync(request.email);
         if (isEmailExist != null)
         {
-            throw new Exception("UserExist");
+            return Errors.Authentication.DuplicateEmail;
         }
 
         var user = new ApplicationUser()
