@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SampleProject.Domain.Enums;
 
 namespace SampleProject.Infrastructure.Data;
 
@@ -69,6 +70,7 @@ public class ApplicationDbContextInitialiser
         // Default roles
         var administratorRole = new ApplicationRole();
         administratorRole.Name = Roles.Administrator;
+        administratorRole.EnumRoleId = RoleEnum.Administrator;
         if (_roleManager.Roles.All(r => r.Name != administratorRole.Name))
         {
             await _roleManager.CreateAsync(administratorRole);

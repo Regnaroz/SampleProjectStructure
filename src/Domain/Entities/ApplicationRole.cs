@@ -9,4 +9,5 @@ namespace SampleProject.Domain.Entities;
 public class ApplicationRole:IdentityRole
 {
     public virtual ICollection<ApplicationUserRole> ApplicationUserRoles { get; set; }
+    public RoleEnum EnumRoleId { get; set; }
 }
