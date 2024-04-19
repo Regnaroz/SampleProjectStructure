@@ -14,8 +14,8 @@ public class AuthenticationMappingConfig : IRegister
         config.NewConfig<AuthenticationResult, AuthenticationResponseDto>()
             .Map(dest => dest.token, src => src.token)
             .Map(dest => dest.Id, src => src.user.Id)
-            .Map(dest => dest.email, src => src.user)
-            .Map(dest => dest.Id, src => src.user.email);
+            .Map(dest => dest.email, src => src.user.email);
+            
         // by this we mean go check if the unassigned properties can be assigned from this object
     }
 }
