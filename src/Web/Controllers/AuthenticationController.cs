@@ -1,23 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MapsterMapper;
+using Microsoft.AspNetCore.Mvc;
+using SampleProject.Application.Authentication.Common;
 using SampleProject.Application.Authentication.Register.Commands.RegisterUser;
-
+using ErrorOr;
 namespace SampleProject.Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController : ApiController
 {
     private readonly ISender _sender;
+    private readonly IMapper _mapper;
 
-    public AuthenticationController(ISender sender)
+    public AuthenticationController(ISender sender, IMapper mapper)
     {
         _sender = sender;
+        _mapper = mapper;
     }
 
     [HttpPost("Register")]
-    public async Task<ActionResult<string>> RegisterUser(RegisterUserDto userDto)
+    public async Task<IActionResult> RegisterUser(RegisterUserDto userDto)
     {
-        var command = new RegisterUserCommand(userDto.firstName, userDto.lastName,userDto.password,userDto.email);
+        var command = _mapper.Map<RegisterUserCommand>(userDto);
+
         var result = await _sender.Send(command);
-        return Ok(result);
+
+        return result.Match(
+            result => Ok(_mapper.Map<AuthenticationResponseDto>(result)),
+            errors => Problem(errors));
     }
 }

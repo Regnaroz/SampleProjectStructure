@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using SampleProject.Application.Authentication.Common;
 using SampleProject.Domain.Constants;
 using SampleProject.Domain.Entities;
+using SampleProject.Domain.Errors;
 using static SampleProject.Application.Authentication.Common.AuthenticationResult;
 
 namespace SampleProject.Application.Authentication.Register.Commands.RegisterUser;
-public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, AuthenticationResult>
+public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, ErrorOr<AuthenticationResult>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
@@ -20,37 +23,48 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, A
         _userManager = userManager;
         _roleManager = roleManager;
     }
-
-    public async Task<AuthenticationResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    async Task<ErrorOr<AuthenticationResult>> IRequestHandler<RegisterUserCommand, ErrorOr<AuthenticationResult>>.Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        var isEmailExist = await _userManager.FindByEmailAsync(request.Email);
-        if(isEmailExist != null)
+        var isEmailExist = await _userManager.FindByEmailAsync(request.email);
+        if (isEmailExist != null)
         {
             throw new Exception("UserExist");
         }
 
-        var user  = new ApplicationUser() {
-            Email = request.Email,
-            UserName = request.Email,
+        var user = new ApplicationUser()
+        {
+            Email = request.email,
+            UserName = request.email,
         };
 
-        var result = await _userManager.CreateAsync(user,request.Password);
-        if (!result.Succeeded) 
-        { 
-            throw new Exception(result.Errors.First().Code);
+        var result = await _userManager.CreateAsync(user, request.password);
+        if (!result.Succeeded)
+        {
+            return HandleRegiserationErrors(result);
         }
 
-        user = await _userManager.FindByEmailAsync(request.Email);
-       if(user != null)
+        user = await _userManager.FindByEmailAsync(request.email);
+        if (user != null)
         {
             await _userManager.AddToRoleAsync(user!, Roles.Administrator);
 
             var userDto = new UserDto(user.Id, user.UserName!, user.UserName!, user.Email!);
-            return new(userDto, string.Empty);
+            return new AuthenticationResult(userDto, string.Empty);
         }
         else
         {
-            throw new  NotFoundException("User was not found! .",nameof(user));
+            return Errors.Authentication.UserNotFound;
         }
+    }
+
+    private ErrorOr<AuthenticationResult> HandleRegiserationErrors(IdentityResult result)
+    {
+        var errors = new List<Error>();
+        foreach (var error in result.Errors)
+        {
+            errors.Add(Error.Failure(code : error.Code , description: error.Description));
+        }
+        
+        return errors;
     }
 }

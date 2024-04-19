@@ -9,9 +9,9 @@ public class RegisterUserCommandValidator : AbstractValidator<RegisterUserComman
 {
     public RegisterUserCommandValidator()
     {
-        RuleFor(v => v.FirstName).NotEmpty().MinimumLength(3).MaximumLength(64);
-        RuleFor(v => v.LastName).NotEmpty().MinimumLength(3).MaximumLength(64);
-        RuleFor(v => v.Email).NotEmpty().MinimumLength(5).MaximumLength(64);
-        RuleFor(v => v.Password).NotEmpty().MinimumLength(8).MaximumLength(64);
+        RuleFor(v => v.firstName).NotEmpty().MinimumLength(3).MaximumLength(64);
+        RuleFor(v => v.lastName).NotEmpty().MinimumLength(3).MaximumLength(64);
+        RuleFor(v => v.email).NotEmpty().MinimumLength(5).MaximumLength(64);
+        RuleFor(v => v.password).NotEmpty().MinimumLength(8).MaximumLength(64);
     }
 }

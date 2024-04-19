@@ -4,7 +4,7 @@ using SampleProject.Application.WeatherForecasts.Queries.GetWeatherForecasts;
 namespace SampleProject.Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-public class WeatherForecasts : ControllerBase
+public class WeatherForecasts : ApiController
 {
     private readonly ISender sender;
 

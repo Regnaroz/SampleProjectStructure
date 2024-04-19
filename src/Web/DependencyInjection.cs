@@ -3,6 +3,7 @@ using SampleProject.Application.Common.Interfaces;
 using SampleProject.Infrastructure.Data;
 using SampleProject.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using SampleProject.Web.Mapping.Config;
 
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,7 @@ public static class DependencyInjection
 
         });
 
+        services.AddMapping();
         return services;
     }
 
