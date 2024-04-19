@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using SampleProject.Application.Authentication.Common;
 using SampleProject.Application.Authentication.Register.Commands.RegisterUser;
 using ErrorOr;
+using Microsoft.EntityFrameworkCore;
+using SampleProject.Domain.Entities;
 namespace SampleProject.Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
@@ -18,14 +20,12 @@ public class AuthenticationController : ApiController
     }
 
     [HttpPost("Register")]
-    public async Task<IActionResult> RegisterUser(RegisterUserDto userDto)
+    public async Task<ActionResult<AuthenticationResponseDto>> RegisterUser(RegisterUserDto userDto)
     {
         var command = _mapper.Map<RegisterUserCommand>(userDto);
 
         var result = await _sender.Send(command);
 
-        return result.Match(
-            result => Ok(_mapper.Map<AuthenticationResponseDto>(result)),
-            errors => Problem(errors));
+        return result.IsError ? Problem(result.Errors) : Ok(result.Value);
     }
 }

@@ -7,7 +7,7 @@ namespace SampleProject.Web.Infrastructure;
 [ApiController]
 public class ApiController : ControllerBase
 {
-    protected IActionResult Problem(List<Error> errors)
+    protected ActionResult Problem(List<Error> errors)
     {
         //idk
         if (errors.Count is 0)
@@ -24,7 +24,7 @@ public class ApiController : ControllerBase
         return errors.Count == 1 ?  Problem(errors[0]) : ValidationProblem(errors);
     }
 
-    private IActionResult ValidationProblem(List<Error> errors)
+    private ActionResult ValidationProblem(List<Error> errors)
     {
         var errorDictionary = new ModelStateDictionary();
         foreach (var error in errors)
@@ -34,7 +34,7 @@ public class ApiController : ControllerBase
         return ValidationProblem(errorDictionary);
     }
 
-    private IActionResult Problem(Error firstError)
+    private ActionResult Problem(Error firstError)
     {
         var StatusCode = firstError.Type switch
         {
