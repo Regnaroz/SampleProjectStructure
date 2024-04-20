@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ErrorOr;
 using Microsoft.AspNetCore.Identity;
 using SampleProject.Application.Authentication.Common;
+using SampleProject.Application.Common.Interfaces;
 using SampleProject.Domain.Constants;
 using SampleProject.Domain.Entities;
 using SampleProject.Domain.Errors;
@@ -17,11 +18,13 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-    public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager)
+    public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager, IJwtTokenGenerator jwtTokenGenerator)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _jwtTokenGenerator = jwtTokenGenerator;
     }
     async Task<ErrorOr<AuthenticationResult>> IRequestHandler<RegisterUserCommand, ErrorOr<AuthenticationResult>>.Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
@@ -35,6 +38,8 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
         {
             Email = request.email,
             UserName = request.email,
+            FirstName = request.firstName,
+            LastName = request.lastName,
         };
 
         var result = await _userManager.CreateAsync(user, request.password);
@@ -49,7 +54,8 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, E
             await _userManager.AddToRoleAsync(user!, Roles.Administrator);
 
             var userDto = new UserDto(user.Id, user.UserName!, user.UserName!, user.Email!);
-            return new AuthenticationResult(userDto, string.Empty);
+            var token = _jwtTokenGenerator.GenerateToken(user);
+            return new AuthenticationResult(userDto, token);
         }
         else
         {

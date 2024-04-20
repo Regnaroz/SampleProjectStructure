@@ -16,7 +16,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IAuthenticationClient {
-    registerUser(userDto: RegisterUserDto): Observable<FileResponse>;
+    registerUser(userDto: RegisterUserDto): Observable<AuthenticationResponseDto>;
 }
 
 @Injectable({
@@ -32,7 +32,7 @@ export class AuthenticationClient implements IAuthenticationClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    registerUser(userDto: RegisterUserDto): Observable<FileResponse> {
+    registerUser(userDto: RegisterUserDto): Observable<AuthenticationResponseDto> {
         let url_ = this.baseUrl + "/api/Authentication/Register";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -44,7 +44,7 @@ export class AuthenticationClient implements IAuthenticationClient {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
-                "Accept": "application/octet-stream"
+                "Accept": "application/json"
             })
         };
 
@@ -55,31 +55,27 @@ export class AuthenticationClient implements IAuthenticationClient {
                 try {
                     return this.processRegisterUser(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileResponse>;
+                    return _observableThrow(e) as any as Observable<AuthenticationResponseDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<FileResponse>;
+                return _observableThrow(response_) as any as Observable<AuthenticationResponseDto>;
         }));
     }
 
-    protected processRegisterUser(response: HttpResponseBase): Observable<FileResponse> {
+    protected processRegisterUser(response: HttpResponseBase): Observable<AuthenticationResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
             (response as any).error instanceof Blob ? (response as any).error : undefined;
 
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200 || status === 206) {
-            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
-            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
-            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
-            if (fileName) {
-                fileName = decodeURIComponent(fileName);
-            } else {
-                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
-                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
-            }
-            return _observableOf({ fileName: fileName, data: responseBlob as any, status: status, headers: _headers });
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AuthenticationResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -229,6 +225,58 @@ export class WeatherForecastsClient implements IWeatherForecastsClient {
     }
 }
 
+export class AuthenticationResponseDto implements IAuthenticationResponseDto {
+    id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    token?: string;
+
+    constructor(data?: IAuthenticationResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
+            this.email = _data["email"];
+            this.token = _data["token"];
+        }
+    }
+
+    static fromJS(data: any): AuthenticationResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AuthenticationResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
+        data["email"] = this.email;
+        data["token"] = this.token;
+        return data;
+    }
+}
+
+export interface IAuthenticationResponseDto {
+    id?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    token?: string;
+}
+
 export class RegisterUserDto implements IRegisterUserDto {
     firstName?: string;
     lastName?: string;
@@ -323,13 +371,6 @@ export interface IWeatherForecast {
     temperatureC?: number;
     temperatureF?: number;
     summary?: string | undefined;
-}
-
-export interface FileResponse {
-    data: Blob;
-    status: number;
-    fileName?: string;
-    headers?: { [name: string]: any };
 }
 
 export class SwaggerException extends Error {
