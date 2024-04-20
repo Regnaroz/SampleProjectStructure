@@ -19,6 +19,9 @@ public static partial class Errors
         public static Error DuplicateEmail => Error.Validation(
            code: "Authentication.DuplicateEmail",
            description: "Email Duplication");
+              public static Error InvalidEmail => Error.Validation(
+           code: "Authentication.InvalidEmail",
+           description: "Invalid Email Address");
         public static Error UserNotFound => Error.Validation(
         code: "Authentication.UserNotFound",
         description: "User was not found! .");

@@ -17,6 +17,7 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IAuthenticationClient {
     registerUser(userDto: RegisterUserDto): Observable<AuthenticationResponseDto>;
+    login(userDto: LoginUserDto): Observable<AuthenticationResponseDto>;
 }
 
 @Injectable({
@@ -63,6 +64,58 @@ export class AuthenticationClient implements IAuthenticationClient {
     }
 
     protected processRegisterUser(response: HttpResponseBase): Observable<AuthenticationResponseDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AuthenticationResponseDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    login(userDto: LoginUserDto): Observable<AuthenticationResponseDto> {
+        let url_ = this.baseUrl + "/api/Authentication/Login";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(userDto);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processLogin(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processLogin(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AuthenticationResponseDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AuthenticationResponseDto>;
+        }));
+    }
+
+    protected processLogin(response: HttpResponseBase): Observable<AuthenticationResponseDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -323,6 +376,46 @@ export interface IRegisterUserDto {
     lastName?: string;
     password?: string;
     email?: string;
+}
+
+export class LoginUserDto implements ILoginUserDto {
+    email?: string;
+    password?: string;
+
+    constructor(data?: ILoginUserDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.email = _data["email"];
+            this.password = _data["password"];
+        }
+    }
+
+    static fromJS(data: any): LoginUserDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LoginUserDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["email"] = this.email;
+        data["password"] = this.password;
+        return data;
+    }
+}
+
+export interface ILoginUserDto {
+    email?: string;
+    password?: string;
 }
 
 export class WeatherForecast implements IWeatherForecast {

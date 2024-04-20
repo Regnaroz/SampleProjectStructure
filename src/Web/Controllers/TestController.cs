@@ -12,7 +12,6 @@ public class TestController : ApiController
     [HttpGet("GetNumberFromROute")]
     public ActionResult<int> GetNumberUpdated2()
     {
-        var t = User.Claims;
         return Ok(5);
     }
 }

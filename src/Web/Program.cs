@@ -26,6 +26,11 @@ else
 app.UseHealthChecks("/health");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSwaggerUi(settings =>
+{
+    settings.Path = "/api";
+    settings.DocumentPath = "/api/specification.json";
+});
 
 
 
@@ -41,11 +46,11 @@ app.UseExceptionHandler(options => { });
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-app.UseSwaggerUi(settings =>
-{
-    settings.Path = "/api";
-    settings.DocumentPath = "/api/specification.json";
-});
+//app.UseSwaggerUi(settings =>
+//{
+//    settings.Path = "/api";
+//    settings.DocumentPath = "/api/specification.json";
+//});
 
 app.Run();
 
