@@ -34,7 +34,7 @@ public class LoginCommandHandler : IRequestHandler<LoginUserCommand, ErrorOr<Aut
         var result = await _signInManager.PasswordSignInAsync(user, request.password, false, lockoutOnFailure: false);
         if (!result.Succeeded)
         {
-            return new List<Error>() { Errors.Authentication.InvalidCredentials, Errors.Authentication.DuplicateEmail };
+            return Errors.Authentication.InvalidCredentials ;
         }
         var token = _jwtGenerator.GenerateToken(user);
         var userDto = new UserDto(user.Id, user.UserName!, user.UserName!, user.Email!);
