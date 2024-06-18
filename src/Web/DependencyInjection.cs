@@ -4,13 +4,16 @@ using SampleProject.Infrastructure.Data;
 using SampleProject.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using SampleProject.Web.Mapping.Config;
+using SampleProject.Web.HangFireFiles;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Hangfire;
 
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddWebServices(this IServiceCollection services)
+    public static IServiceCollection AddWebServices(this IServiceCollection services, ConfigurationManager configuration)
     {
         services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -40,6 +43,27 @@ public static class DependencyInjection
         });
 
         services.AddMapping();
+
+        //HangFire settings
+        services.AddHostedService<RequeryingJobService>();
+        //  services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        //.AddCookie(options =>
+        //{
+        //    options.Cookie.Name = "GPS.Job.Cookie";
+        //    options.LoginPath = "/Home/Index";
+        //    options.AccessDeniedPath = new PathString("/");
+        //    options.Cookie.HttpOnly = true;
+        //    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        //    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+        //    options.SlidingExpiration = true;
+        //});
+        services.AddHangfire(s => s.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+        services.AddHangfireServer(s =>
+            {
+                s.WorkerCount = 1;
+            }
+            );
+
         return services;
     }
 

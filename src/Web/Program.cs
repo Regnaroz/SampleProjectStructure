@@ -1,5 +1,8 @@
+using Hangfire;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using SampleProject.Infrastructure.Data;
+using SampleProject.Web.HangFireFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +11,7 @@ builder.Services.AddKeyVaultIfConfigured(builder.Configuration);
 
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddWebServices();
+builder.Services.AddWebServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -52,6 +55,11 @@ app.MapControllers();
 //    settings.DocumentPath = "/api/specification.json";
 //});
 
+//HangFire
+app.UseHangfireDashboard(
+                        "/hangfire",
+                         new DashboardOptions() { Authorization = new[] { new HangFireAuthFilter() } }
+                         );
 app.Run();
 
 public partial class Program { }
