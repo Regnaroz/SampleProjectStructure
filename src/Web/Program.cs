@@ -2,7 +2,6 @@ using Hangfire;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SampleProject.Infrastructure.Data;
-using SampleProject.Web.HangFireFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,11 +54,6 @@ app.MapControllers();
 //    settings.DocumentPath = "/api/specification.json";
 //});
 
-//HangFire
-app.UseHangfireDashboard(
-                        "/hangfire",
-                         new DashboardOptions() { Authorization = new[] { new HangFireAuthFilter() } }
-                         );
 app.Run();
 
 public partial class Program { }

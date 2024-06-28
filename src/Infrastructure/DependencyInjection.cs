@@ -13,6 +13,9 @@ using SampleProject.Infrastructure.Authentication;
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using SampleProject.Infrastructure.Services;
+using SampleProject.Application.IServices;
+using SampleProject.Application.IRepositries;
+using SampleProject.Infrastructure.Repositires;
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
@@ -24,7 +27,8 @@ public static class DependencyInjection
         Guard.Against.Null(connectionString, message: "Connection string 'DefaultConnection' not found.");
 
         services.AddScoped<ISaveChangesInterceptor, AuditableEntityInterceptor>();
-        services.AddScoped<ISaveChangesInterceptor, DispatchDomainEventsInterceptor>();
+        services.AddScoped<IWeatherforcastService, WeatherforcastService>();
+        services.AddScoped<IWeatherforcastRepositry, WeatherforcastRepositry>();
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
@@ -48,10 +52,10 @@ public static class DependencyInjection
         services.AddAuthorization(options =>
             options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
 
-        services.AddAuth(configuration);
+        services.AddAuthenticationServices(configuration);
         return services;
     }
-    public static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddAuthenticationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
 

@@ -14,9 +14,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-    public DbSet<TodoList> TodoLists => Set<TodoList>();
-
-    public DbSet<TodoItem> TodoItems => Set<TodoItem>();
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     public DbSet<ApplicationRole> ApplicationRoles { get; set; }
     public DbSet<ApplicationUserRole> ApplicationUserRoles { get; set; }

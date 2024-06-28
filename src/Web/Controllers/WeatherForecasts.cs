@@ -1,24 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using SampleProject.Application.WeatherForecasts.Queries.GetWeatherForecasts;
-using SampleProject.Domain.Constants;
+﻿using Microsoft.AspNetCore.Mvc;
+using SampleProject.Application.IServices;
+using SampleProject.Domain.Entities;
 
 namespace SampleProject.Web.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(Roles = Roles.User)]
 public class WeatherForecasts : ApiController
 {
-    private readonly ISender sender;
+    private readonly IWeatherforcastService _weatherforcastService;
 
-    public WeatherForecasts(ISender sender)
+    public WeatherForecasts(IWeatherforcastService weatherforcastService)
     {
-        this.sender = sender;
+        _weatherforcastService = weatherforcastService;
     }
 
     [HttpGet]
     public async Task<IEnumerable<WeatherForecast>> GetWeatherForecasts()
     {
-        return await sender.Send(new GetWeatherForecastsQuery());
+        return await _weatherforcastService.GetWeatherData();
     }
 }

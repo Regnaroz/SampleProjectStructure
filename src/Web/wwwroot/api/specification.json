@@ -6,70 +6,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Authentication/Register": {
-      "post": {
-        "tags": [
-          "Authentication"
-        ],
-        "operationId": "RegisterUser",
-        "requestBody": {
-          "x-name": "userDto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RegisterUserDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthenticationResponseDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Authentication/Login": {
-      "post": {
-        "tags": [
-          "Authentication"
-        ],
-        "operationId": "Login",
-        "requestBody": {
-          "x-name": "userDto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginUserDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AuthenticationResponseDto"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/Test/GetNumberFromROute": {
       "get": {
         "tags": [
@@ -117,58 +53,6 @@
   },
   "components": {
     "schemas": {
-      "AuthenticationResponseDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "guid"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "token": {
-            "type": "string"
-          }
-        }
-      },
-      "RegisterUserDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        }
-      },
-      "LoginUserDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          }
-        }
-      },
       "WeatherForecast": {
         "type": "object",
         "additionalProperties": false,

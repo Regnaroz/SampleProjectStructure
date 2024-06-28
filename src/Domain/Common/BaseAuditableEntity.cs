@@ -1,7 +1,8 @@
 ﻿namespace SampleProject.Domain.Common;
 
-public abstract class BaseAuditableEntity : BaseEntity
+public abstract class BaseAuditableEntity 
 {
+    public int Id { get; set; }
     public DateTimeOffset Created { get; set; }
 
     public string CreatedBy { get; set; }
