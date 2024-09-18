@@ -38,4 +38,13 @@ public class AuthenticationController : ApiController
 
         return result.IsError ? Problem(result.Errors) : Ok(result.Value);
     }
+    [HttpPost("Login22Test")]
+    public async Task<ActionResult<AuthenticationResponseDto>> Login22Test(LoginUserDto userDto)
+    {
+        var command = _mapper.Map<LoginUserCommand>(userDto);
+
+        var result = await _sender.Send(command);
+
+        return result.IsError ? Problem(result.Errors) : Ok(result.Value);
+    }
 }

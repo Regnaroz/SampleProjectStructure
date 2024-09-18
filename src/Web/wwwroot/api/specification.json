@@ -70,6 +70,38 @@
         }
       }
     },
+    "/api/Authentication/Login22Test": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "Login22Test",
+        "requestBody": {
+          "x-name": "userDto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginUserDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Test/GetNumberFromROute": {
       "get": {
         "tags": [
